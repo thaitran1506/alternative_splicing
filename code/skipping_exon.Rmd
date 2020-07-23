@@ -1,0 +1,133 @@
+
+Read in the skipping exon data from the rmats output of soleus WT vs MT. 
+```{r}
+se_sol = read.csv("~/Desktop/alternative_splicing/alternative_splicing/data/rmats_soleus_WT_MT/SE.MATS.JC.txt",
+                  sep = "\t",
+                  stringsAsFactors = FALSE)
+```
+
+Set the cutoff for FDR <= 0.05 and IncLevelDifference >= 0.05
+```{r}
+se_sol_cutoff = subset(se_sol, FDR <= 0.05 & IncLevelDifference >= 0.05)
+```
+
+Further refine the table to filter out genes with low read counts. There are 4 columns that need to be further manipulated. Each column has multiple values representing the read count for each replicate. They need to be split into individual numbers then summed up to get the total count for each genotype. 
+
+```{r}
+sum_readcount = function(x){
+  return(sum(as.numeric(unlist(strsplit(x, ",")))))
+}
+```
+
+```{r}
+IJC_sam1 = sapply(se_sol_cutoff$IJC_SAMPLE_1, sum_readcount)
+```
+
+```{r}
+SJC_sam1 = sapply(se_sol_cutoff$SJC_SAMPLE_1, sum_readcount)
+IJC_sam2 = sapply(se_sol_cutoff$IJC_SAMPLE_2, sum_readcount)
+SJC_sam2 = sapply(se_sol_cutoff$SJC_SAMPLE_2, sum_readcount)
+```
+
+```{r}
+se_sol_cutoff$IJC_total_S1 = IJC_sam1
+se_sol_cutoff$SJC_total_S1 = SJC_sam1
+se_sol_cutoff$IJC_total_S2 = IJC_sam2
+se_sol_cutoff$SJC_total_S2 = SJC_sam2
+```
+
+Now extract the genes with total read count of at least 50. Can be any column
+```{r}
+se_sol_final = subset(se_sol_cutoff, IJC_total_S1 >= 50 | SJC_total_S1 >= 50 | IJC_total_S2 >= 50 | SJC_total_S2 >= 50)
+
+```
+
+Now write the final table to file
+
+```{r}
+write.csv(se_sol_final, "~/Desktop/alternative_splicing/alternative_splicing/output/se_sol_WTvsMT_final.csv")
+```
+
+Now repeat the same process for the rest of the skipping exon rmats output 
+
+TIBIALIS WT VS MT
+```{r}
+se_sol = read.csv("~/Desktop/alternative_splicing/alternative_splicing/data/rmats_tibialis_WT_MT/SE.MATS.JC.txt",
+                  sep = "\t",
+                  stringsAsFactors = FALSE)
+```
+
+```{r}
+se_sol_cutoff = subset(se_sol, FDR <= 0.05 & IncLevelDifference >= 0.05)
+IJC_sam1 = sapply(se_sol_cutoff$IJC_SAMPLE_1, sum_readcount)
+SJC_sam1 = sapply(se_sol_cutoff$SJC_SAMPLE_1, sum_readcount)
+IJC_sam2 = sapply(se_sol_cutoff$IJC_SAMPLE_2, sum_readcount)
+SJC_sam2 = sapply(se_sol_cutoff$SJC_SAMPLE_2, sum_readcount)
+se_sol_cutoff$IJC_total_S1 = IJC_sam1
+se_sol_cutoff$SJC_total_S1 = SJC_sam1
+se_sol_cutoff$IJC_total_S2 = IJC_sam2
+se_sol_cutoff$SJC_total_S2 = SJC_sam2
+se_tib_final = subset(se_sol_cutoff, IJC_total_S1 >= 50 | SJC_total_S1 >= 50 | IJC_total_S2 >= 50 | SJC_total_S2 >= 50)
+
+```
+
+Now write the final table to file
+
+```{r}
+write.csv(se_tib_final, "~/Desktop/alternative_splicing/alternative_splicing/output/se_tib_WTvsMT_final.csv")
+```
+
+WT SOLEUS VS TIBIALIS
+
+```{r}
+se_sol = read.csv("~/Desktop/alternative_splicing/alternative_splicing/data/rmats_soleus_tib_WT/SE.MATS.JC.txt",
+                  sep = "\t",
+                  stringsAsFactors = FALSE)
+```
+
+```{r}
+se_sol_cutoff = subset(se_sol, FDR <= 0.05 & IncLevelDifference >= 0.05)
+IJC_sam1 = sapply(se_sol_cutoff$IJC_SAMPLE_1, sum_readcount)
+SJC_sam1 = sapply(se_sol_cutoff$SJC_SAMPLE_1, sum_readcount)
+IJC_sam2 = sapply(se_sol_cutoff$IJC_SAMPLE_2, sum_readcount)
+SJC_sam2 = sapply(se_sol_cutoff$SJC_SAMPLE_2, sum_readcount)
+se_sol_cutoff$IJC_total_S1 = IJC_sam1
+se_sol_cutoff$SJC_total_S1 = SJC_sam1
+se_sol_cutoff$IJC_total_S2 = IJC_sam2
+se_sol_cutoff$SJC_total_S2 = SJC_sam2
+se_WT_final = subset(se_sol_cutoff, IJC_total_S1 >= 50 | SJC_total_S1 >= 50 | IJC_total_S2 >= 50 | SJC_total_S2 >= 50)
+
+```
+
+Now write the final table to file
+
+```{r}
+write.csv(se_WT_final, "~/Desktop/alternative_splicing/alternative_splicing/output/se_WT_sol_vs_tib_final.csv")
+```
+
+MT: Soleus vs Tibialis
+```{r}
+se_sol = read.csv("~/Desktop/alternative_splicing/alternative_splicing/data/rmats_soleus_tib_MT/SE.MATS.JC.txt",
+                  sep = "\t",
+                  stringsAsFactors = FALSE)
+```
+
+```{r}
+se_sol_cutoff = subset(se_sol, FDR <= 0.05 & IncLevelDifference >= 0.05)
+IJC_sam1 = sapply(se_sol_cutoff$IJC_SAMPLE_1, sum_readcount)
+SJC_sam1 = sapply(se_sol_cutoff$SJC_SAMPLE_1, sum_readcount)
+IJC_sam2 = sapply(se_sol_cutoff$IJC_SAMPLE_2, sum_readcount)
+SJC_sam2 = sapply(se_sol_cutoff$SJC_SAMPLE_2, sum_readcount)
+se_sol_cutoff$IJC_total_S1 = IJC_sam1
+se_sol_cutoff$SJC_total_S1 = SJC_sam1
+se_sol_cutoff$IJC_total_S2 = IJC_sam2
+se_sol_cutoff$SJC_total_S2 = SJC_sam2
+se_MT_final = subset(se_sol_cutoff, IJC_total_S1 >= 50 | SJC_total_S1 >= 50 | IJC_total_S2 >= 50 | SJC_total_S2 >= 50)
+
+```
+
+Now write the final table to file
+
+```{r}
+write.csv(se_MT_final, "~/Desktop/alternative_splicing/alternative_splicing/output/se_MT_sol_vs_tib_final.csv")
+```
