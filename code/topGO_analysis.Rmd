@@ -1,0 +1,77 @@
+```{r}
+se_sol = read.csv("~/Desktop/alternative_splicing/alternative_splicing/output/se_sol_WT_vs_MT_final.csv",
+                  stringsAsFactors = FALSE)
+```
+
+```{r}
+gene_df = data.frame(se_sol$geneSymbol, se_sol$FDR)
+```
+
+because there are duplicates, average the FDR of the duplicates
+```{r}
+library(dplyr)
+dup_removed = gene_df %>% group_by(se_sol.geneSymbol) %>% summarise_all(funs(mean))
+```
+
+```{r}
+allGenes = dup_removed$se_sol.FDR
+names(allGenes) = dup_removed$se_sol.geneSymbol
+```
+
+```{r}
+selFun = function(genelist){
+  return(genelist <= 0.05)
+}
+
+```
+
+```{r}
+head(selFun(allGenes))
+```
+
+```{r}
+library(topGO)
+library(org.Mm.eg.db)
+```
+
+```{r}
+GOdata = new('topGOdata',
+             ontology = 'CC',
+             allGenes = allGenes,
+             geneSel = selFun,
+             annot = annFUN.org,
+             mapping = 'org.Mm.eg.db',
+             ID = "symbol")
+```
+
+```{r}
+resultFisher = runTest(GOdata, algorithm = "classic", statistic = "fisher")
+```
+
+```{r}
+resultFisher
+```
+```{r}
+resultKS = runTest(GOdata, algorithm = "classic", statistic = "ks")
+```
+
+```{r}
+resultKS.elim = runTest(GOdata, algorithm = "elim", statistic = "ks")
+```
+
+```{r}
+allRes <- GenTable(GOdata, classicFisher = resultFisher,
+                   classicKS = resultKS, elimKS = resultKS.elim,
+                   orderBy = "elimKS", ranksOf = "classicFisher", topNodes = 20)
+```
+
+```{r}
+library(Rgraphviz)
+```
+
+```{r}
+tiff("~/Desktop/go.tiff", width = 10, height = 8, units = 'in', res = 500)
+showSigOfNodes(GOdata, score(resultKS.elim), firstSigNodes = 10, useInfo = 'all')
+dev.off()
+```
+

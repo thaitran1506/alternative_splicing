@@ -1,0 +1,63 @@
+```{r}
+number_of_gene = c(29, 36, 10, 8, 6, 23, 8, 9, 139, 70, 26, 123, 4, 6, 2, 7, 293, 265, 41, 238)
+
+```
+
+```{r}
+files = list.files("~/Desktop/alternative_splicing/alternative_splicing/output/")
+```
+
+```{r}
+plot_data = data.frame(files, number_of_gene)
+```
+
+Function to get the splicing type
+
+```{r}
+library(stringr)
+```
+Only str_split of stringr can split on special character
+
+```{r}
+splicing_type = function(x){
+  require(stringr)
+  return(unlist(str_split(x, pattern ="_"))[1])
+}
+```
+
+
+```{r}
+splicing.event = sapply(plot_data$files, splicing_type)
+```
+
+```{r}
+plot_data$splicing.event = splicing.event
+```
+
+```{r}
+type_of_analysis = function(x){
+  require(stringr)
+  split = unlist(str_split(x, pattern = "_"))
+  return(paste0(split[2],".", split[3],".", split[4],".", split[5]))
+}
+```
+
+
+```{r}
+analysis = sapply(plot_data$files, type_of_analysis)
+
+```
+
+```{r}
+plot_data$analysis = analysis
+```
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+ggplot(plot_data, aes(x = analysis, y = number_of_gene, fill = splicing.event)) + 
+  geom_bar(stat = "identity",
+           position = position_dodge(width = 0.9))
+```
